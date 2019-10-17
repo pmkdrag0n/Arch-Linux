@@ -1,0 +1,85 @@
+import requests
+import json
+import sys
+from tabulate import tabulate
+
+APICEM_IP = "10.215.26.10" #Địa chỉ IP của APIC-EM
+USERNAME ="admin" # Tên đăng nhập trong APIC-EM
+PASSWORD ="VnPro@149" # Mật khẩu của tài khoản APIC-EM
+VERSION = "v1" # Phiên bản APIC-EM version 1
+#Tắt tin nhắn cảnh báo
+requests.packages.urllib3.disable_warnings()
+
+'''Tạo hàm để lấy token;
+các tham số ip,ver,uname,pword được gắn giá trị khai báo ở trên'''
+def get_auth_token(ip=APICEM_IP,ver=VERSION,uname=USERNAME,pword=PASSWORD):
+#Tạo 1 jsonObject có 2 key username,password có value tương ứng là uname,pword
+    r_json = {
+        "username": uname,
+        "password": pword
+    }
+    post_url = "https://"+ip+"/api/"+ver+"/ticket" # URl để post
+    headers = {"Content-Type" : "application/json"} #khai báo headers
+
+    try:
+        r=requests.post(
+            post_url,data = json.dumps(r_json),
+            headers = headers,verify=False) #gửi requests đến server
+        #post là tạo dũ liệu ,post_url là địa chỉ ta muốn gửi đến,
+        #json.dumps dùng để mã hóa username và password,
+        #verify=False để không xác thực SSL
+        r.raise_for_status() # Lấy mã trạng thái, 200 là thành công, 404 là not found
+        token = r.json()["response"]["serviceTicket"] #Lấy ticket từ r
+        # Trả về giá trị
+        return {
+            "token" : token
+        }
+    except:
+        print("Status: %s" %r.status_code)
+        print("Response: %s" %r.text)
+
+# Tạo hàm get để lấy thông tin
+def get(ip=APICEM_IP,ver=VERSION,uname=USERNAME,pword=PASSWORD,api='',params=''):
+    ticket = get_auth_token() #Lấy ticket bằng cách gọi hàm
+    headers = {"X-Auth-Token": ticket['token']} #Khai báo headers để gắn ticket vào
+    url = "https://"+ip+"/api/"+ver+"/"+api
+    print("\nExecuting GET '%s'\n"%url) #In ra thông tin để ng dùng biết đang lấy dữ liệu
+    try:
+        #gửi request đến server, resp là lời đáp lại của yêu cầu, get là lấy dữ liệu
+        resp = requests.get(url,headers=headers,params=params,verify=False)
+        print("GET '%s' status" %api,resp.status_code,'\n') #In ra trạng thái
+        return(resp)
+    except:
+        print("Something wrong",api)
+        sys.exit()
+
+device =[]
+try:
+    resp = get(api="network-device") # Lấy thông tin về network-device
+    status = resp.status_code #Lấy trạng thái của yêu cầu trên
+    response_json = resp.json() #Lấy nội dung json đã mã hóa từ lời đáp lại
+    device = response_json["response"] #Gán thông tin từ lời đáp lại vào device
+
+except:
+    print("Something wrong,cannot get network device info")
+    sys.exit()
+# Nếu status khác 200(nghĩa là không thành công) thì in lời đáp lại và thoát chương trình
+if status !=200:
+    print (resp.text)
+    sys.exit()
+# Nếu chuỗi trống thi in ra không có thiết bị được tìm thấy và thoát chương trình
+if device == []:
+    print("No network device found")
+    sys.exit()
+
+device_list =[]
+i=0
+#Tạo một vòng lặp để dò từng item và thực hiện gán các giá trị vào device_list
+#item["hostname"] là dò tìm key hostname trong item và lấy ra value
+for item in device:
+    i+=1
+    device_list.append([i,item["hostname"],item["managementIpAddress"],
+                        item["type"],item["instanceUuid"]])
+#thư viện tabulate dùng để khi in dữ liệu ra theo format đã được xây dựng sẵn
+print(tabulate(device_list,
+            headers = ['number','hostname','ip','type','mac address'], tablefmt="rst"))
