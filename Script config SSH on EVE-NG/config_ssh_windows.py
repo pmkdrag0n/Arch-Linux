@@ -22,7 +22,7 @@ for x in range (n):
     print("Configuring device "+ str(x)+"...")
     telnet.send_config_set(config_int_e0)
     telnet.send_config_set(config_ssh)
-    output = telnet.send_command("show ip int brief",delay_factor=10)
+    output = telnet.send_command("show ip int brief",delay_factor=12)
     print(output)
     print("#"*50)
     porttn=porttn+1
