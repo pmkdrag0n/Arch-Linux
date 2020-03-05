@@ -1,36 +1,92 @@
-#import threading
 from multiprocessing import Process
 from datetime import datetime
 from netmiko import ConnectHandler
-
+from ntc_templates.parse import parse_output
+import sys
+import time
+def parse(data_p):
+    output_parse=parse_output(platform="cisco_ios", command="show ip int br", data=data_p)
+    device_IP=output_parse[0]
+    ip=device_IP["ipaddr"]
+    return ip
+def ansible_file():
+    f=open("hosts","w")
+    f.write("[all:vars]\n")
+    f.write("ansible_user=admin\n")
+    f.write("ansible_password=123\n")
+    f.write("ansible_connection=network_cli\n")
+    f.write('ansible_become="yes"\n')
+    f.write('ansible_become_method="enable"\n')
+    f.write("ansible_network_os=ios\n")
+    f.write("[device]\n")
+    f.close()
 def show_ip(a_device):
-    remote_conn = ConnectHandler(**a_device)
-    print()
-    print("#" * 80)
-    print(remote_conn.send_command_expect("show ip int br"))
-    print("#" * 80)
-    print()
-
-
-
-def main():
+    list_IP=[]
+    f=open("hosts","a")
+    telnet = ConnectHandler(**a_device)
+    output=telnet.send_command_expect("show ip int br")
+    f.write(parse(output)+"\n")
+    f.close()
+def config_ssh(a_device):
+    config_int_e0=["int e0/0",
+    "no sw",
+    "no shut",
+    "ip add dhcp"
+    ]
+    config_ssh=[
+    "enable pass 321",
+    "username admin pass 123",
+    "ip domain-name pmk",
+    "crypto key ge rsa modul 1024",
+    "line vty 0 15",
+    "login local",
+    "pass 123"
+    ]
+    telnet = ConnectHandler(**a_device)
+    telnet.enable()
+    telnet.send_config_set(config_int_e0)
+    telnet.send_config_set(config_ssh)
+    telnet.disconnect()
+def list_menu():
     print("1.Cau hinh SSH cho cac thiet bi")
-    print("2.Thu nhap cac IP cua thiet bi")
-    choice=input("Nhap lua chon cua ban: ")
-    if choice=="1":
-        command=config_ssh
-    if choice=="2":
-        command=show_ip
-    procs = []
-    for a_device in devices:
-        my_proc = Process(target=command, args=(a_device,))
-        my_proc.start()
-        procs.append(my_proc)
+    print("2.Thu nhap cac IP cua thiet bi xuat ra file hosts")
+    print("0.Thoat")
+def menu():
+        list_menu()
+        choice=int(input("Nhap lua chon cua ban: "))
+        if choice==1:
+            print("Bat dau gui cau hinh len thiet bi...")
+            command=config_ssh
+            procs = []
+            for a_device in devices:
+                my_proc = Process(target=command, args=(a_device,))
+                my_proc.start()
+                procs.append(my_proc)
+            time.sleep(10)
+            print("Hoan tat cong viec")
+            menu()
+        elif choice==2:
+            print("Bat dau thi nhap IP va xuat ra file")
+            command=show_ip
+            ansible_file()
+            procs = []
+            for a_device in devices:
+                my_proc = Process(target=command, args=(a_device,))
+                my_proc.start()
+                procs.append(my_proc)
+            time.sleep(10)
+            print("Hoan tat cong viec")
+            menu()
+        elif choice==0:
+            sys.exit
+        else:
+            print("Invalid choice selected")
 if __name__ == "__main__":
-    sl=int(input("Nhap sl:"))
+    ip_sv=input("Nhap IP server EVE-NG: ")
+    sl=int(input("Nhap so luong thiet bi co trong so do mang: "))
     sw={
             "device_type" : "cisco_ios_telnet",
-            "ip" : "192.168.1.129",
+            "ip" : ip_sv,
             "port" :"32769",
             "secret":"321"
             }
@@ -41,4 +97,4 @@ if __name__ == "__main__":
         sw1["port"]=str(portt)
         devices.append(sw1)
         portt=portt+1
-    main()
+    menu()
