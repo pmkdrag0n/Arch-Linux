@@ -1,8 +1,4 @@
-Script thuc hien cau hinh SSH va thu nhap IP cua cac thiet bi co trong so do mang cua EVE-NG
-
-Truoc khi chay can phai cai dat python 3.6 tro len va cai dat cac thu vien can thiet de chay Script
-
-Windows:
-  py -m pip install netmiko
-Linux:
-  pip install netmiko ntc_templates
+Script thực hiện cấu hình SSH và thu nhập các thiết bị có trong sơ đồ mạng của EVE-NG
+Yêu cầu trước khi chạy Script cần cài đặt Python 3.6 trở lên và các thư viện cần thiết
+Windows: py -m pip install netmiko
+Linux: pip install netmiko ntc_templates
