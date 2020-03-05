@@ -19,7 +19,7 @@ config_ssh=[
 for x in range (n):
     telnet= ConnectHandler(device_type="cisco_ios_telnet",ip=ip_sv,port=porttn,secret="321",blocking_timeout=16)
     telnet.enable()
-    print("Configuring device "+ str(x)+"...")
+    print("Configuring device "+ str(x+1)+"...")
     telnet.send_config_set(config_int_e0)
     telnet.send_config_set(config_ssh)
     output = telnet.send_command("show ip int brief",delay_factor=12)
