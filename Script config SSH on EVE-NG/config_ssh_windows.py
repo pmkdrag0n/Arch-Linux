@@ -24,7 +24,7 @@ def config_ssh(a_device):
 def show_ip(a_device):
         telnet=ConnectHandler(**a_device)
         print("*"*80)
-        print(telnet.send_command_expect("show ip int br",delay_factor=30))
+        print(telnet.send_command_expect("show ip int br"))
         print("*"*80)
 def list_menu():
     print("1.Cau hinh SSH cho cac thiet bi")
