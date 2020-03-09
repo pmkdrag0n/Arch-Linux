@@ -12,7 +12,7 @@ def config_ssh(a_device):
         "username admin pass 123",
         "ip domain-name pmk",
         "crypto key ge rsa modul 1024",
-        "line vty 0 15",
+        "line vty 0 4",
         "login local",
         "pass 123"
         ]
