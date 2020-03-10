@@ -79,7 +79,7 @@ def menu():
             clear()
             menu()
         elif choice==2:
-            print("Bat dau thi nhap IP va xuat ra file")
+            print("Bat dau thu nhap IP va xuat ra file")
             command=show_ip
             ansible_file()
             procs = []

@@ -45,7 +45,7 @@ def menu():
         print("Hoan tat cong viec")
         menu()
     elif choice==2:
-        print("Bat dau thi nhap IP va xuat ra file")
+        print("Bat dau thu nhap IP va xuat ra file")
         command=show_ip
         procs = []
         for a_device in devices:
