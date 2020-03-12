@@ -38,10 +38,25 @@ def show_ip(a_device):
     return list_IP
 def config_ssh(a_device):
     telnet = ConnectHandler(**a_device)
+<<<<<<< HEAD
     config_int_e0=["int e0/0",
     "no sw",
     "no shut",
     "ip add dhcp",
+=======
+    device=telnet.find_prompt()
+    if device.lower() == "router>":
+        interface="f0/0"
+        typed="R"
+    else:
+        interface ="e0/0"
+        typed="SW"
+    config_int_e0=["int "+interface,
+    "no sw",
+    "no shut",
+    "ip add dhcp",
+    "hostname "+typed
+>>>>>>> 94aaf82435e0d286cd3827238035efad03313bf6
     ]
     config_ssh=[
     "enable pass 321",
