@@ -5,9 +5,12 @@ from ntc_templates.parse import parse_output
 import getpass
 import sys
 import time
-from os import system
+from os import system, name
 def clear():
-    _=system("clear")
+    if name == 'nt':
+        _ = system('cls')
+    else:
+        _ = system('clear')
 def parse(data_p):
     output_parse=parse_output(platform="cisco_ios", command="show ip int br", data=data_p)
     device_IP=output_parse[0]
@@ -34,10 +37,11 @@ def show_ip(a_device):
     f.close()
     return list_IP
 def config_ssh(a_device):
+    telnet = ConnectHandler(**a_device)
     config_int_e0=["int e0/0",
     "no sw",
     "no shut",
-    "ip add dhcp"
+    "ip add dhcp",
     ]
     config_ssh=["hostname "+a_device["port"],
     "enable pass 321",
@@ -49,7 +53,6 @@ def config_ssh(a_device):
     "pass "+str(master_pass),
     "transport input all"
     ]
-    telnet = ConnectHandler(**a_device)
     telnet.enable()
     telnet.send_config_set(config_int_e0)
     telnet.send_config_set(config_ssh)
@@ -79,7 +82,7 @@ def menu():
             clear()
             menu()
         elif choice==2:
-            print("Bat dau thi nhap IP va xuat ra file")
+            print("Bat dau thu nhap IP va xuat ra file")
             command=show_ip
             ansible_file()
             procs = []
