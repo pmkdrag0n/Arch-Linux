@@ -39,7 +39,7 @@ def config_ssh(a_device):
     "no shut",
     "ip add dhcp"
     ]
-    config_ssh=[
+    config_ssh=["hostname "+a_device["port"],
     "enable pass 321",
     "username admin pass "+str(master_pass),
     "ip domain-name pmk",
