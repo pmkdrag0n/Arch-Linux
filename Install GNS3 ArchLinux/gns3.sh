@@ -7,7 +7,7 @@ $left Installing dynamips $right
 sleep 2
 
 sudo pacman -S libelf libpcap cmake --noconfirm --needed
-trizen -S dynamips --noconfirm --needed
+yay -S dynamips --noconfirm --needed
 }
 install_vpcs() {
   # Installing VPCS
@@ -15,7 +15,7 @@ install_vpcs() {
 $left Installing VPCS $right
 "
   sleep 2
-  trizen -S vpcs --noconfirm --needed
+  yay -S vpcs --noconfirm --needed
 }
 
 install_iouyap() {
@@ -25,7 +25,7 @@ $left Installing IOUYAP $right
 "
   sleep 2
   sudo pacman -S iniparser --noconfirm --needed
-  trizen -S iouyap --noconfirm --needed
+  yay -S iouyap --noconfirm --needed
 }
 
 install_iol_dependencies() {
@@ -49,8 +49,8 @@ install_ubridge() {
   printf %b\\n "
 $left Installing uBridge$right
 "
-  trizen -S ubridge --noconfirm --needed
-  pacman -S dnsmasq libvirt --noconfirm --needed
+  yay -S ubridge --noconfirm --needed
+  sudo pacman -S ebtables dnsmasq libvirt virt-manager --noconfirm --needed
 }
 
 install_qemu() {
@@ -88,15 +88,15 @@ install_gns3() {
 $left Installing GNS3 Dependencies $right
 "
 cd /tmp && git clone https://aur.archlinux.org/python-jsonschema26.git && cd python-jsonschema26 && makepkg -si --nocheck
-trizen -S python-aiohttp-cors-gns3 python-yarl-gns3 --noconfirm --needed
+yay -S python-aiohttp-cors-gns3 python-yarl-gns3 --noconfirm --needed
   printf %b\\n "
 $left Installing GNS3 GUI $right
 "
-trizen -S gns3-gui --noconfirm --needed
+yay -S gns3-gui --noconfirm --needed
 printf %b\\n "
 $left Installing Server $right
 "
-trizen -S gns3-server --noconfirm --needed
+yay -S gns3-server --noconfirm --needed
 }
 main() {
   install_dynamips
